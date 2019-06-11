@@ -28,21 +28,14 @@ function loadAllImages(srcs) {
 // input handlers:
 // TK
 
-var srcs = ["assets/cuteflower.png",
+var srcs = ["assets/transparency.png",
+			"assets/cuteflower.png",
 			"assets/pinetree.png",
 			"assets/seedling2.png",
 			"assets/tree2.png",
 			"assets/groundflower.png",
 			"assets/seedling1.png",
 			"assets/tree1.png"];
-
-dumbIndices = {"cuteflower" : 0,
-				"pinetree" : 1,
-				"seedling2" : 2,
-				"tree2" : 3,
-				"groundflower" : 4,
-				"seedling1" : 5,
-				"tree1" : 6};
 
 var images = [];
 
@@ -51,7 +44,7 @@ loadAllImages(srcs).then(_images => {
 	images = _images;
 
 	// start animation:
-	init();
+	initGrid();
 	tick();
 });
 
@@ -64,23 +57,38 @@ function fillCell() {
 	return getRandomInt(srcs.length);
 }
 
-function init() {
+function initGrid() {
 	grid = makeGrid();
 	grid = grid.map(row => {return row.map(cell => {return fillCell()})})
 }
 
 var then = performance.now();
 
+// input handlers:
+const keyboardState = {};
+
+window.addEventListener('keydown', (e) => {
+	console.log(keyboardState);
+	tick();
+	//keyboardState[e.key] = true;
+});
+
+/*window.addEventListener('keyup', (e) => {
+	delete keyboardState[e.key];
+});*/
+
 function tick() {
+	console.log('called');
 	var now = performance.now();
 	var dt = (now - then) / 1000; // diff in seconds
 
+	initGrid();
 	update(dt);
 	draw();
 
 	then = now;
 
-	window.requestAnimationFrame(tick); // scheduling next frame
+	//window.requestAnimationFrame(tick); // scheduling next frame
 }
 
 var state = {
@@ -89,6 +97,8 @@ var state = {
 
 function update(dt) {
 }
+
+colorOptions = ['#6abe30', '#37946e', '#4b692f']
 
 function draw() {
 	const width = canvas.width;
@@ -108,8 +118,10 @@ function draw() {
 					ctx.drawImage(item, x, y)});*/
 	for(let x=0; x<worldSize; x++) {
 		for(let y=0; y<worldSize; y++) {
+			ctx.fillStyle = colorOptions[Math.round((grid[x][y])/3)];
+			ctx.fillRect(x*squareSide, y*squareSide, squareSide, squareSide);
 			imageIndex = grid[x][y]
-			ctx.drawImage(images[imageIndex], x*squareSide, y*squareSide, squareSide, squareSide)
+			ctx.drawImage(images[imageIndex], x*squareSide, y*squareSide, squareSide, squareSide);
 		}
 	}
 
